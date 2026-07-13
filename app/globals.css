@@ -1,0 +1,13 @@
+@import 'tailwindcss';
+
+.stats-card {
+  @apply m-1 min-w-full rounded bg-gray-100 p-4 sm:min-w-64 sm:px-6 sm:py-4;
+}
+
+.stats-card-title {
+  @apply text-base;
+}
+
+.stats-currency {
+  @apply text-xl font-medium;
+}
