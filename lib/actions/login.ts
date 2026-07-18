@@ -5,9 +5,9 @@ import { createSession, deleteSession } from "@/lib/actions/session";
 import { redirect } from "next/navigation";
 import { passwordRegex, usernameRegex } from "../common/constants";
 
-const testUser = {
-    username: "rahuldas",
-    password: "Rd@920485",
+const defaultUser = {
+    username: process.env.DEFAULT_USER_USERNAME,
+    password: process.env.DEFAULT_USER_PASSWORD,
 };
 
 const loginSchema = z.object({
@@ -17,6 +17,8 @@ const loginSchema = z.object({
 
 export const login = async (prevState: any, formData: FormData) => {
 
+    console.log(formData)
+
     const result = loginSchema.safeParse(Object.fromEntries(formData))
 
     if (!result.success)
@@ -24,10 +26,10 @@ export const login = async (prevState: any, formData: FormData) => {
 
     const { username, password } = result.data
 
-    if (username !== testUser.username || password !== testUser.password)
-        return { errors: { message: ["Invalid username or password"] } }
+    if (username !== defaultUser.username || password !== defaultUser.password)
+        return { errors: { message: "Invalid username or password" } }
 
-    await createSession(testUser.username);
+    await createSession(defaultUser.username);
 
     redirect("/");
 }

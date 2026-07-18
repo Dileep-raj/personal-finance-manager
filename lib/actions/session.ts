@@ -2,11 +2,11 @@ import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-const secretKey = process.env.SESSION_SECRET;
+const secretKey = process.env.SESSION_SECRET!;
 const encodedKey = new TextEncoder().encode(secretKey);
 
 export const createSession = async (username: string) => {
-    const expiresAt = new Date(Date.now() + parseInt(process.env.SESSION_TIMEOUT ?? "1200000"));
+    const expiresAt = new Date(Date.now() + Number.parseInt(process.env.SESSION_TIMEOUT ?? "1200000"));
     const session = await encryptJWT({ username, expiresAt });
     const cookieStore = await cookies()
     cookieStore.set("session", session, {
@@ -31,12 +31,14 @@ export const encryptJWT = async (payload: SessionCookiePayload) => {
 }
 
 export const decryptJWT = async (session: string | undefined = "") => {
+    if (!session) {
+        console.log("Session key not found")
+        return
+    }
     try {
-        const { payload } = await jwtVerify(session, encodedKey, {
-            algorithms: ["HS256"],
-        });
+        const { payload } = await jwtVerify<SessionCookiePayload>(session, encodedKey, { algorithms: ["HS256"] });
         return payload;
     } catch (err) {
-        console.log("Failed to verify session");
+        console.error("Failed to verify session\n", err)
     }
 }

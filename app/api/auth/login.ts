@@ -8,7 +8,7 @@ export const login = async (username: string, password: string) => {
         const user = await User.findOne({ username })
 
         // Invalid username or password
-        if (!user || !user.validPassword(password)) NextResponse.json({ success: false, message: "Invalid username or password" })
+        if (!user?.validPassword(password)) NextResponse.json({ success: false, message: "Invalid username or password" })
 
         NextResponse.json({
             success: true,

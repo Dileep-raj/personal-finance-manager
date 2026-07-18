@@ -1,3 +1,4 @@
+import Navbar from "@/components/header/Navbar";
 import "@/app/globals.css";
 
 export default function AuthLayout({
@@ -7,6 +8,7 @@ export default function AuthLayout({
 }>) {
     return (
         <>
+            <Navbar />
             {children}
         </>
     );
