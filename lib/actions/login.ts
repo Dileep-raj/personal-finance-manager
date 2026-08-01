@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createSession, deleteSession } from "@/lib/actions/session";
 import { redirect } from "next/navigation";
 import { passwordRegex, usernameRegex } from "../common/constants";
+import User from "../models/user.model";
 
 const defaultUser = {
     username: process.env.DEFAULT_USER_USERNAME,
@@ -24,10 +25,13 @@ export const login = async (prevState: any, formData: FormData) => {
 
     const { username, password } = result.data
 
-    if (username !== defaultUser.username || password !== defaultUser.password)
+    const user = await User.findOne({ username })
+
+    // if (!user?.validPassword(password) || username !== defaultUser.username || password !== defaultUser.password)
+    if (!user?.validPassword(password))
         return { errors: { message: "Invalid username or password" } }
 
-    await createSession(defaultUser.username);
+    await createSession(username);
 
     redirect("/");
 }

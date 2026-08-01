@@ -1,10 +1,11 @@
 "use client";
 
 import { useFormStatus } from "react-dom";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 import { login } from "@/lib/actions/login";
 import { LogInIcon } from "lucide-react";
 import PasswordShowToggleIcon from "@/components/buttons/PasswordShowToggleIcon";
+import Link from "next/link";
 
 const LoginButton = ({ disabled = false }: { disabled?: boolean }) => {
     const { pending } = useFormStatus();
@@ -47,6 +48,10 @@ const LoginForm = () => {
                 {state?.errors?.message && <span className="error-message mt-1 text-sm text-red-600 text-center font-medium">{state.errors.message}</span>}
             </div>
             <LoginButton />
+            <div className="self-center font-medium text-sm">
+                <span> Don&apos;t have an account? </span>
+                <Link href="/signup" className="text-blue-500">Signup</Link>
+            </div>
         </form >
     )
 }

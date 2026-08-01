@@ -1,5 +1,6 @@
 import mongoose, { Document } from "mongoose";
 import bcrypt from "bcryptjs";
+import { usernameRegex } from "../common/constants";
 
 export interface IUser extends Document {
     username: string;
@@ -16,7 +17,7 @@ const userSchema = new mongoose.Schema<IUser>(
             maxLength: [30, "Username must not exceed 30 characters"],
             minlength: [5, "Username must be atleast 5 characters long"],
             lowercase: true,
-            match: [/[a-z0-9_]/, "Username must contain only lowercase alphabets, digits or underscore (_)"]
+            match: [usernameRegex, "Username must contain only lowercase alphabets, digits or underscore (_)"]
         },
         password: {
             type: String,
@@ -27,8 +28,10 @@ const userSchema = new mongoose.Schema<IUser>(
     { timestamps: true },
 );
 
-// Hash the password
-userSchema.methods.generateHash = (password: string) => bcrypt.hashSync(password);
+userSchema.pre("save", function () {
+    // Hash the password
+    if (this.password) this.password = bcrypt.hashSync(this.password)
+})
 
 // Validate password
 userSchema.methods.validPassword = function (password: string) {
