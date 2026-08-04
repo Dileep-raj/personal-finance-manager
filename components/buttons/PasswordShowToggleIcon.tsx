@@ -7,7 +7,7 @@ interface PasswordButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const PasswordShowToggleIcon = ({ hidden = true, ...props }: PasswordButtonProps) => {
     const iconSize = 18
-    return <button type="button" {...props} title={hidden ? "Show password" : "Hide password"}>
+    return <button tabIndex={-1} type="button" {...props} title={hidden ? "Show password" : "Hide password"}>
         {hidden ? <EyeOffIcon size={iconSize} /> : <EyeIcon size={iconSize} />}
     </button>
 }
