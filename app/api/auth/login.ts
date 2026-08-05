@@ -1,10 +1,8 @@
 import User from "@/lib/models/user.model";
-import { connectToDatabase } from "@/lib/mongoose";
 import { NextResponse } from "next/server";
 
 export const login = async (username: string, password: string) => {
     try {
-        await connectToDatabase()
         const user = await User.findOne({ username })
 
         // Invalid username or password

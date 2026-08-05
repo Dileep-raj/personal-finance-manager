@@ -4,7 +4,6 @@ import { z } from "zod";
 import { redirect } from "next/navigation";
 import { allowedSpecialCharacters, passwordRegex, usernameRegex } from "../common/constants";
 import User from "../models/user.model";
-import { connectToDatabase } from "../mongoose";
 
 const signupSchema = z.object({
   username: z.string()
@@ -39,9 +38,6 @@ export type SignupFormState = {
 };
 
 export const signup = async (prevState: SignupFormState, formData: FormData): Promise<SignupFormState> => {
-
-  const connected = await connectToDatabase()
-  if (!connected) console.error("Could not connect to mongodb!")
 
   // Validate username and password with zod schema
   const result = signupSchema.safeParse(Object.fromEntries(formData))
