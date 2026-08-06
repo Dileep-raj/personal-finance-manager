@@ -1,23 +1,13 @@
 "use client";
 
-import { useFormStatus } from "react-dom";
 import { useActionState, useState } from "react";
 import { login } from "@/lib/actions/login";
 import { LogInIcon } from "lucide-react";
 import PasswordShowToggleIcon from "@/components/buttons/PasswordShowToggleIcon";
 import Link from "next/link";
 
-const LoginButton = ({ disabled = false }: { disabled?: boolean }) => {
-    const { pending } = useFormStatus();
-    return <button disabled={disabled || pending} type="submit"
-        className="flex w-full items-center justify-center px-3 py-1.5 text-sm/6 font-semibold shadow-xs bg-blue-500 hover:bg-blue-400 mx-auto rounded-md text-white cursor-pointer m-3 disabled:pointer-events-none disabled:opacity-50">
-        <LogInIcon className="w-5 h-5 mr-2" />
-        <span> Login </span>
-    </button>
-}
-
 const LoginForm = () => {
-    const [state, loginAction] = useActionState(login, undefined)
+    const [state, loginAction, pending] = useActionState(login, undefined)
     const [hidden, setHidden] = useState(true)
 
     return (
@@ -47,7 +37,13 @@ const LoginForm = () => {
             <div className="flex h-4 items-center justify-center">
                 {state?.errors?.message && <span className="error-message mt-1 text-sm text-red-600 text-center font-medium">{state.errors.message}</span>}
             </div>
-            <LoginButton />
+
+            <button disabled={pending} type="submit"
+                className="flex w-full items-center justify-center px-3 py-1.5 text-sm/6 font-semibold shadow-xs bg-blue-500 hover:bg-blue-400 mx-auto rounded-md text-white cursor-pointer m-3 disabled:pointer-events-none disabled:opacity-50">
+                <LogInIcon className="w-5 h-5 mr-2" />
+                <span> Login </span>
+            </button>
+
             <div className="self-center font-medium text-sm">
                 <span> Don&apos;t have an account? </span>
                 <Link href="/signup" className="text-blue-500">Signup</Link>

@@ -1,4 +1,5 @@
 import "@/app/globals.css";
+import { ToastContainer } from "react-toastify";
 
 export default function AuthLayout({
     children,
@@ -8,6 +9,7 @@ export default function AuthLayout({
     return (
         <>
             {children}
+            <ToastContainer position="bottom-center" hideProgressBar={true} />
         </>
     );
 }

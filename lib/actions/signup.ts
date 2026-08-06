@@ -52,13 +52,14 @@ export const signup = async (prevState: SignupFormState, formData: FormData): Pr
 
     const newUser = new User({ username, password })
     const save = await newUser.save()
+
     if (save.username) console.log("Saved user", save.username)
     else return { message: "Signup failed", success: false, status: 400 }
+
+    return { success: true, status: 201, message: "Signup successful!" }
   }
   catch (error) {
     console.error(error)
     return { message: "Signup failed", success: false, status: 500 }
   }
-
-  redirect("/login");
 }

@@ -1,11 +1,13 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { signup, SignupFormState } from "@/lib/actions/signup";
 import PasswordShowToggleIcon from "@/components/buttons/PasswordShowToggleIcon";
 import Link from "next/link";
 import { CheckIcon, XIcon } from "lucide-react";
 import { allowedSpecialCharacters, usernameRegex } from "@/lib/common/constants";
+import { toast } from "react-toastify";
+import { redirect } from "next/navigation";
 
 const uppercaseRegex = new RegExp(/[A-Z]+/)
 const lowercaseRegex = new RegExp(/[a-z]+/)
@@ -41,6 +43,13 @@ const SignupForm = () => {
     const [state, signupAction, pending] = useActionState(signup, initialState)
     const [hidden, setHidden] = useState(true)
     const [formDataChecks, setFormDataChecks] = useState(initialFormDataCheck)
+
+    useEffect(() => {
+        if (state.success) {
+            toast.success("Account created successfully")
+            redirect("/login")
+        }
+    }, [state])
 
     const performFormDataChecks = () => {
         const username = usernameRef.current?.value

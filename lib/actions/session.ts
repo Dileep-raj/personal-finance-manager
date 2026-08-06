@@ -32,7 +32,7 @@ export const encryptJWT = async (payload: SessionCookiePayload) => {
 
 export const decryptJWT = async (session: string | undefined = "") => {
     if (!session) {
-        console.log("Session key not found")
+        // console.log("Session key not found")
         return
     }
     try {
