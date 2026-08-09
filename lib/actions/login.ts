@@ -6,11 +6,6 @@ import { redirect } from "next/navigation";
 import { passwordRegex, usernameRegex } from "../common/constants";
 import User from "../models/user.model";
 
-const defaultUser = {
-    username: process.env.DEFAULT_USER_USERNAME,
-    password: process.env.DEFAULT_USER_PASSWORD,
-};
-
 const loginSchema = z.object({
     username: z.string().regex(usernameRegex, { error: "Invalid username" }).trim(),
     password: z.string().regex(passwordRegex, { error: "Invalid password" }).trim(),
