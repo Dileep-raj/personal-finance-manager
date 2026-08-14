@@ -3,8 +3,8 @@
 import { z } from "zod";
 import { createSession, deleteSession } from "@/lib/actions/session";
 import { redirect } from "next/navigation";
-import { passwordRegex, usernameRegex } from "../common/constants";
-import User from "../models/user.model";
+import { passwordRegex, usernameRegex } from "@/lib/common/constants";
+import User from "@/lib/mongodb/models/user.model";
 
 const loginSchema = z.object({
     username: z.string().regex(usernameRegex, { error: "Invalid username" }).trim(),

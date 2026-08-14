@@ -1,9 +1,8 @@
 'use server';
 
 import { z } from "zod";
-import { redirect } from "next/navigation";
-import { allowedSpecialCharacters, passwordRegex, usernameRegex } from "../common/constants";
-import User from "../models/user.model";
+import { allowedSpecialCharacters, passwordRegex, usernameRegex } from "@/lib/common/constants";
+import User from "@/lib/mongodb/models/user.model";
 
 const signupSchema = z.object({
   username: z.string()

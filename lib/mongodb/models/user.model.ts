@@ -1,6 +1,6 @@
 import mongoose, { Document } from "mongoose";
 import bcrypt from "bcryptjs";
-import { usernameRegex } from "../common/constants";
+import { usernameRegex } from "@/lib/common/constants";
 
 export interface IUser extends Document {
     username: string;

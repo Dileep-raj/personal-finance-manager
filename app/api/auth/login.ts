@@ -1,4 +1,4 @@
-import User from "@/lib/models/user.model";
+import User from "@/lib/mongodb/models/user.model";
 import { NextResponse } from "next/server";
 
 export const login = async (username: string, password: string) => {

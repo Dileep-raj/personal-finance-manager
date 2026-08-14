@@ -1,4 +1,4 @@
-import { connectToDatabase } from "./lib/mongoose"
+import { connectToDatabase } from "@/lib/mongodb/mongoose"
 
 
 export async function register() {
