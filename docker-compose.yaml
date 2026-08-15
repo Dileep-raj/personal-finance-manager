@@ -1,0 +1,37 @@
+services:
+  pfm:
+    build:
+      context: .
+    image: pfm-nextjs:latest
+    container_name: pfm-app
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env.docker
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:8.2
+    container_name: pfm-mongodb
+    volumes:
+      - pfm-mongodb-data:/data/db
+    env_file:
+      - .env.docker
+    restart: unless-stopped
+    hostname: mongodb
+    ports:
+      - '27018:27017'
+    healthcheck:
+      test:
+        [
+          CMD,
+          mongosh,
+          'mongodb://localhost:27017/admin',
+          '--eval=db.runCommand({ping:1})'
+        ]
+      retries: 3
+      timeout: 5s
+
+volumes:
+  pfm-mongodb-data:
