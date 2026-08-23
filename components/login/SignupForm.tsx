@@ -43,7 +43,7 @@ const SignupForm = () => {
     const [state, signupAction, pending] = useActionState(signup, initialState)
     const [hidden, setHidden] = useState(true)
     const [formDataChecks, setFormDataChecks] = useState(initialFormDataCheck)
-
+    
     useEffect(() => {
         if (state.success) {
             toast.success("Account created successfully")

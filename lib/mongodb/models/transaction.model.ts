@@ -1,14 +1,15 @@
 import mongoose, { Document, ObjectId } from "mongoose";
 import bcrypt from "bcryptjs";
-import type { PaymentMethod, TransactionType } from "@/lib/types";
+import { PaymentMethodEnum, TransactionTypeEnum, type TransactionType } from "@/lib/types";
 
 
 export interface ITransaction extends Document {
     userId: ObjectId;
     amount: number;
+    transactionTitle: string;
     transactionType: TransactionType;
     transactionDate: Date;
-    transactionMode: PaymentMethod;
+    transactionMode: PaymentMethodEnum;
     tags?: Array<string>;
     receiver?: string
 }
@@ -22,18 +23,27 @@ const transactionSchema = new mongoose.Schema<ITransaction>(
         },
         amount: {
             type: Number,
-            required: true,
+            required: [true, "is required"],
             min: [0, "Invalid amount"],
             max: [1000000000, "Invalid amount"],
-            allowNull: false
+        },
+        transactionTitle: {
+            type: String,
+            required: [true, "Transaction title is required"],
         },
         transactionType: {
-            required: true,
-            allowNull: false
+            type: String,
+            enum: Object.values(TransactionTypeEnum),
+            required: [true, "Transaction type is required"],
         },
         transactionDate: {
-            required: true,
-            allowNull: false
+            type: Date,
+            required: [true, "Transaction date is required"],
+        },
+        transactionMode: {
+            type: String,
+            enum: Object.values(PaymentMethodEnum),
+            required: [true, "Transaction mode is required"]
         },
         tags: {
             type: [String],
