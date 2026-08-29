@@ -6,39 +6,38 @@ import SelectTransactionMode from "@/components/select/SelectTransactionMode"
 import { addExpense } from "@/lib/actions/transaction";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { SelectOption } from "@/lib/types/ui/select";
 
 
 const AddExpenseForm = () => {
 
     interface AddExpenseFormState {
         success: boolean
-        error?: string
+        error?: unknown
     }
 
     const initialState: AddExpenseFormState = {
         success: false
     }
 
+    const [tags, setTags] = useState<SelectOption[]>([])
+
     const handleExpenseSubmit = (prevState: AddExpenseFormState, formData: FormData) => {
         try {
             const transactionPayload = Object.fromEntries(formData.entries())
-            console.log("Transaction form data", transactionPayload)
-            transactionPayload.transactionDate = new Date(transactionPayload.transactionDate)
-            transactionPayload.tags = tags.map((tag) => tag.value)
             return addExpense(transactionPayload)
         }
         catch (error) {
+            console.error(error)
             return { success: false, error: error }
         }
     }
 
     const [state, addExpenseAction, pending] = useActionState(handleExpenseSubmit, initialState)
-    const [tags, setTags] = useState<[]>([])
 
     useEffect(() => {
         if (state.success) toast.success("Expense added successfully")
         else if (state.error) toast.error("Could not save expense")
-        console.log(state)
     }, [state])
 
     return <div className="mt-10 gap-4 sm:mx-auto sm:w-full flex flex-col justify-center p-10 rounded-2xl border">
@@ -87,10 +86,8 @@ const AddExpenseForm = () => {
                         <label htmlFor="transactionTags" className="form-label block text-sm/6 font-medium text-gray-900"> Tags </label>
                         <div className="mt-2">
                             <SelectTags
-                                name="transactionTags"
-                                id="transactionTags"
                                 options={tags}
-                                onChange={tags => setTags(tags)}
+                                onChange={(tags: SelectOption[]) => setTags(tags)}
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                             />
                         </div>

@@ -78,6 +78,6 @@ transactionSchema.methods.validPassword = function (password: string) {
     return bcrypt.compareSync(password, this.password);
 };
 
-const User = mongoose.models.User || mongoose.model("User", transactionSchema);
+const Transaction = mongoose.models.Transaction || mongoose.model("Transaction", transactionSchema);
 
-export default User;
+export default Transaction;

@@ -13,8 +13,9 @@ const transactionPayloadSchema = z.object({
         .lt(1000000000, { error: "Maximum amount is 1000000000" }),
     transactionTitle: z.string().trim().nonempty({ error: "Invalid title" }),
     transactionMode: z.enum(PaymentMethodEnum, { error: "Invalid payment method" }),
-    transactionDate: z.date({ error: "Invalid date" }),
-    tags: z.string().toLowerCase().trim().array().transform(tags => [...new Set(tags.filter(Boolean))]),
+    transactionDate: z.coerce.date({ error: "Invalid date" }),
+    transactionTags: z.string().toLowerCase().trim()
+        .array().transform(tags => [...new Set(tags.filter(Boolean))]).default([]).optional(),
     receiver: z.string().optional()
 })
 export type TransactionPayload = z.infer<typeof transactionPayloadSchema>
@@ -27,6 +28,7 @@ export const addExpense = async (payload: unknown) => {
     const result = transactionPayloadSchema.safeParse(payload)
 
     if (!result.success) return {
+        success: result.success,
         error: result.error,
         pretty: z.prettifyError(result.error),
         flat: z.flattenError(result.error),
@@ -34,11 +36,11 @@ export const addExpense = async (payload: unknown) => {
     }
 
     const transaction = new Transaction({
-        ...(payload as TransactionPayload),
+        userId: user._id,
         transactionType: TransactionTypeEnum.debit,
-        userId: user._id
+        ...(payload as TransactionPayload),
     })
-    console.log("Transaction created", transaction)
+    await transaction.save()
 
     return { success: true, data: result.data, message: "Expense saved successfully" }
 }
