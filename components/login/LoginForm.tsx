@@ -5,50 +5,58 @@ import { login } from "@/lib/actions/login";
 import { LogInIcon } from "lucide-react";
 import PasswordShowToggleIcon from "@/components/buttons/PasswordShowToggleIcon";
 import Link from "next/link";
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 
 const LoginForm = () => {
     const [state, loginAction, pending] = useActionState(login, undefined)
     const [hidden, setHidden] = useState(true)
 
     return (
-        <form action={loginAction} className="mt-10 gap-4 sm:mx-auto sm:w-full sm:max-w-sm flex flex-col justify-center p-10 rounded-2xl border">
-            <div className="text-center mb-4">
-                <h4 className="text-xl font-medium text-gray-800">Login</h4>
-            </div>
+        <Card className="w-full max-w-sm p-6">
+            <CardHeader className="text-center">
+                <CardTitle className="text-xl font-medium">Login</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <form action={loginAction}>
+                    <FieldGroup className="flex flex-col gap-8 mt-2">
+                        <Field>
+                            <FieldLabel htmlFor="username">Username</FieldLabel>
+                            <Input name="username" id="username" type="username" required />
+                        </Field>
 
-            <div>
-                <label htmlFor="username" className="block text-sm/6 font-medium text-gray-900"> Username </label>
-                <div className="mt-2">
-                    <input id="username" name="username" type="username" required autoComplete="username"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                </div>
-            </div>
+                        <Field>
+                            <FieldLabel htmlFor="password">Password</FieldLabel>
+                            <InputGroup>
+                                <InputGroupInput name="password" id="password" required type={hidden ? "password" : "text"} autoComplete="current-password" />
+                                <InputGroupAddon align="inline-end">
+                                    <PasswordShowToggleIcon className="cursor-pointer absolute right-1 self-center p-2 z-10" hidden={hidden} onClick={() => setHidden(!hidden)} />
+                                </InputGroupAddon>
+                            </InputGroup>
+                        </Field>
 
-            <div>
-                <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900"> Password </label>
-                <div className="mt-2 relative flex">
-                    <input id="password" name="password" type={hidden ? "password" : "text"} required autoComplete="current-password"
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
-                    <PasswordShowToggleIcon className="cursor-pointer absolute right-1 self-center p-2 z-10" hidden={hidden} onClick={() => setHidden(!hidden)} />
-                </div>
-            </div>
+                        {/* <div className="flex h-4 items-center justify-center">
+                            {state?.errors?.message && <span className="error-message mt-1 text-sm text-red-600 text-center font-medium">{state.errors.message}</span>}
+                        </div> */}
 
-            <div className="flex h-4 items-center justify-center">
-                {state?.errors?.message && <span className="error-message mt-1 text-sm text-red-600 text-center font-medium">{state.errors.message}</span>}
-            </div>
+                        <Field className="gap-4">
+                            <Button disabled={pending} type="submit" className="w-full">
+                                <LogInIcon className="w-5 h-5" />
+                                Login
+                            </Button>
+                            <FieldDescription className="text-center">
+                                <span> Don&apos;t have an account? </span>
+                                <Link href="/signup">Signup</Link>
+                            </FieldDescription>
+                        </Field>
+                    </FieldGroup>
+                </form>
+            </CardContent>
+        </Card>
 
-            <button disabled={pending} type="submit"
-                className="flex w-full items-center justify-center px-3 py-1.5 text-sm/6 font-semibold shadow-xs bg-blue-500 hover:bg-blue-400 mx-auto rounded-md text-white cursor-pointer m-3 disabled:pointer-events-none disabled:opacity-50">
-                <LogInIcon className="w-5 h-5 mr-2" />
-                <span> Login </span>
-            </button>
-
-            <div className="self-center font-medium text-sm">
-                <span> Don&apos;t have an account? </span>
-                <Link href="/signup" className="text-blue-500">Signup</Link>
-            </div>
-        </form >
     )
 }
 
