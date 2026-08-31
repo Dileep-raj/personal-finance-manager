@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { login } from "@/lib/actions/login";
 import { LogInIcon } from "lucide-react";
 import PasswordShowToggleIcon from "@/components/buttons/PasswordShowToggleIcon";
@@ -10,15 +10,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import { toast } from "@/components/ui/toast";
 
 const LoginForm = () => {
     const [state, loginAction, pending] = useActionState(login, undefined)
     const [hidden, setHidden] = useState(true)
 
+    useEffect(() => {
+        if (state?.errors?.message) toast.add({
+            type: "error",
+            description: state?.errors?.message || "Invalid username or password"
+        })
+    }, [state])
+
     return (
         <Card className="w-full max-w-sm p-6">
             <CardHeader className="text-center">
-                <CardTitle className="text-xl font-medium">Login</CardTitle>
+                <CardTitle>Login</CardTitle>
             </CardHeader>
             <CardContent>
                 <form action={loginAction}>
@@ -49,14 +57,13 @@ const LoginForm = () => {
                             </Button>
                             <FieldDescription className="text-center">
                                 <span> Don&apos;t have an account? </span>
-                                <Link href="/signup">Signup</Link>
+                                <Link href="/signup">Sign up</Link>
                             </FieldDescription>
                         </Field>
                     </FieldGroup>
                 </form>
             </CardContent>
         </Card>
-
     )
 }
 

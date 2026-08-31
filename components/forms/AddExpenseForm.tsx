@@ -5,8 +5,8 @@ import SelectTags from "@/components/select/SelectTags"
 import SelectTransactionMode from "@/components/select/SelectTransactionMode"
 import { addExpense } from "@/lib/actions/transaction";
 import { useActionState, useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import { SelectOption } from "@/lib/types/ui/select";
+import { toast } from "@/components/ui/toast";
 
 
 const AddExpenseForm = () => {
@@ -36,8 +36,8 @@ const AddExpenseForm = () => {
     const [state, addExpenseAction, pending] = useActionState(handleExpenseSubmit, initialState)
 
     useEffect(() => {
-        if (state.success) toast.success("Expense added successfully")
-        else if (state.error) toast.error("Could not save expense")
+        if (state.success) toast.add({ type: "success", description: "Expense added successfully" })
+        else if (state.error) toast.add({ type: "error", description: "Could not save expense" })
     }, [state])
 
     return <div className="mt-10 gap-4 sm:mx-auto sm:w-full flex flex-col justify-center p-10 rounded-2xl border">

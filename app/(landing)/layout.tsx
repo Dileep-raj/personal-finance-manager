@@ -1,6 +1,5 @@
 import Navbar from "@/components/header/Navbar";
 import "@/app/globals.css";
-import { ToastContainer } from "react-toastify";
 
 export default function AuthLayout({
     children,
@@ -11,7 +10,6 @@ export default function AuthLayout({
         <>
             <Navbar />
             {children}
-            <ToastContainer position="bottom-center" hideProgressBar={true} />
         </>
     );
 }

@@ -4,10 +4,15 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { signup, SignupFormState } from "@/lib/actions/signup";
 import PasswordShowToggleIcon from "@/components/buttons/PasswordShowToggleIcon";
 import Link from "next/link";
-import { CheckIcon, XIcon } from "lucide-react";
+import { CheckIcon, UserRoundPlusIcon, XIcon } from "lucide-react";
 import { allowedSpecialCharacters, usernameRegex } from "@/lib/common/constants";
-import { toast } from "react-toastify";
 import { redirect } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
 
 const uppercaseRegex = new RegExp(/[A-Z]+/)
 const lowercaseRegex = new RegExp(/[a-z]+/)
@@ -17,6 +22,7 @@ const illegalCharactersRegex = new RegExp((String.raw`[^A-Za-z\d${allowedSpecial
 const initialFormDataCheck = {
     username: {
         error: "",
+        ok: false,
     },
     password: {
         uppercase: false,
@@ -26,7 +32,10 @@ const initialFormDataCheck = {
         specialCharacter: false,
         ok: false
     },
-    passwordsMatch: true,
+    confirmPassword: {
+        passwordsMatch: true,
+        ok: false,
+    },
     ok: false
 }
 
@@ -46,20 +55,35 @@ const SignupForm = () => {
 
     useEffect(() => {
         if (state.success) {
-            toast.success("Account created successfully")
+            toast.add({
+                type: "success",
+                description: "Account created successfully"
+            })
             redirect("/login")
+        } else if (state.message || state.errors?.[0]) {
+            toast.add({
+                type: "error",
+                description: state.message || state.errors?.[0] || "Something went wrong"
+            })
         }
     }, [state])
 
     const performFormDataChecks = () => {
         const username = usernameRef.current?.value
         const password = passwordRef.current?.value
+        const confirmPassword = confirmPasswordRef.current?.value
+
         const checks = structuredClone(initialFormDataCheck)
+
         if (username) {
             if (username.length < 5 || username.length > 20) checks.username.error = "Username must be 5-20 characters long"
             else if (!usernameRegex.test(username)) checks.username.error = "Use only lowercase letters, numbers, dots (.) and underscores (_)"
-            else checks.username.error = ""
+            else {
+                checks.username.error = ""
+                checks.username.ok = true
+            }
         }
+
         if (password) {
             checks.password.uppercase = uppercaseRegex.test(password)
             checks.password.lowercase = lowercaseRegex.test(password)
@@ -69,107 +93,108 @@ const SignupForm = () => {
             checks.password.ok = checks.password.uppercase && checks.password.lowercase && checks.password.digit &&
                 checks.password.specialCharacter && checks.password.length
         }
-        checks.passwordsMatch = checkPasswordMatch()
-        checks.ok = checks.username.error === "" && checks.password.ok && confirmPasswordRef.current?.value !== ""
+
+        checks.confirmPassword.passwordsMatch = checkPasswordMatch(password, confirmPassword)
+        checks.confirmPassword.ok = checks.confirmPassword.passwordsMatch && confirmPasswordRef.current?.value !== ""
+
+        checks.ok = checks.username.ok && checks.password.ok && checks.confirmPassword.ok
         setFormDataChecks(checks)
     }
 
-    const checkPasswordMatch = () => {
-        if (!passwordRef.current?.value || !confirmPasswordRef.current?.value) return true
-        return passwordRef.current?.value === confirmPasswordRef.current?.value
-    }
+    const checkPasswordMatch = (password?: string | null, confirmPassword?: string | null) => !password || !confirmPassword || password === confirmPassword
 
     return (
-        <form action={signupAction} className="mt-10 gap-4 sm:mx-auto sm:w-full sm:max-w-md flex flex-col justify-center p-10 rounded-2xl border">
-            <div className="text-center mb-4">
-                <h4 className="text-xl font-medium text-gray-800">Create a new account</h4>
-            </div>
+        <Card className="w-full max-w-sm p-6">
+            <CardHeader className="text-center">
+                <CardTitle>Create an account</CardTitle>
+            </CardHeader>
 
-            <div>
-                <label htmlFor="username" className="block text-sm/6 font-medium text-gray-900"> Username </label>
-                <div className="mt-2">
-                    <input id="username" name="username" type="username" minLength={5} onChange={performFormDataChecks} ref={usernameRef} required
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                    />
-                </div>
-                {
-                    formDataChecks.username.error && <span className="error-message mt-1 text-sm text-red-600 text-center font-medium">
-                        {formDataChecks.username.error}
-                    </span>
-                }
-            </div>
+            <CardContent>
+                <form action={signupAction}>
+                    <FieldGroup className="flex flex-col gap-6 mt-2">
+                        <Field>
+                            <FieldLabel htmlFor="username">Username</FieldLabel>
+                            <Input id="username" name="username" type="text" minLength={5} onChange={performFormDataChecks}
+                                ref={usernameRef} required aria-invalid={!formDataChecks.username.ok} />
+                            <FieldError>{state.properties?.username?.errors?.[0] || formDataChecks.username.error}</FieldError>
+                        </Field>
 
-            <div>
-                <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900"> Password </label>
-                <div className="mt-2 relative flex">
-                    <input id="password" name="password" type={hidden ? "password" : "text"} minLength={8} onChange={performFormDataChecks} ref={passwordRef} required
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
-                    <PasswordShowToggleIcon className="cursor-pointer absolute right-1 self-center p-2 z-10" hidden={hidden} onClick={() => setHidden(!hidden)} />
-                </div>
-            </div>
+                        <Field>
+                            <FieldLabel htmlFor="password">Password</FieldLabel>
+                            <InputGroup>
+                                <InputGroupInput id="password" name="password" type={hidden ? "password" : "text"} onChange={performFormDataChecks}
+                                    minLength={8} ref={passwordRef} required aria-invalid={!formDataChecks.password.ok} />
+                                <InputGroupAddon>
+                                    <PasswordShowToggleIcon className="cursor-pointer absolute right-1 self-center p-2 z-10" hidden={hidden} onClick={() => setHidden(!hidden)} />
+                                </InputGroupAddon>
+                            </InputGroup>
+                            <FieldError>{state.properties?.password?.errors?.[0]}</FieldError>
+                        </Field>
 
-            <div>
-                <label htmlFor="confirmPassword" className="block text-sm/6 font-medium text-gray-900"> Confirm Password </label>
-                <div className="mt-2 relative flex">
-                    <input id="confirmPassword" type={hidden ? "password" : "text"} onChange={performFormDataChecks} ref={confirmPasswordRef} required
-                        className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
-                    <PasswordShowToggleIcon className="cursor-pointer absolute right-1 self-center p-2 z-10" hidden={hidden} onClick={() => setHidden(!hidden)} />
-                </div>
-                {
-                    !formDataChecks.passwordsMatch &&
-                    <span className="error-message mt-1 text-sm text-red-600 text-center font-medium">Passwords do not match</span>
-                }
-            </div>
+                        <Field>
+                            <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
+                            <InputGroup>
+                                <InputGroupInput id="confirmPassword" type={hidden ? "password" : "text"} onChange={performFormDataChecks}
+                                    ref={confirmPasswordRef} required aria-invalid={!formDataChecks.confirmPassword.ok} />
+                                <InputGroupAddon>
+                                    <PasswordShowToggleIcon className="cursor-pointer absolute right-1 self-center p-2 z-10" hidden={hidden} onClick={() => setHidden(!hidden)} />
+                                </InputGroupAddon>
+                            </InputGroup>
+                            {!formDataChecks.confirmPassword.passwordsMatch && <FieldError>Passwords do not match</FieldError>}
+                        </Field>
 
-            {
-                !formDataChecks.password.ok &&
-                <div className="password-validations text-sm flex flex-col gap-1.5">
-                    <div className={`flex items-center gap-1 ${formDataChecks.password.uppercase ? "text-green-500" : "text-red-500"}`}>
-                        {formDataChecks.password.uppercase ? <CheckIcon /> : <XIcon />}
-                        <span> Password must contain an uppercase letter </span>
-                    </div>
-                    <div className={`flex items-center gap-1 ${formDataChecks.password.lowercase ? "text-green-500" : "text-red-500"}`}>
-                        {formDataChecks.password.lowercase ? <CheckIcon /> : <XIcon />}
-                        <span> Password must contain a lowercase letter </span>
-                    </div>
-                    <div className={`flex items-center gap-1 ${formDataChecks.password.digit ? "text-green-500" : "text-red-500"}`}>
-                        {formDataChecks.password.digit ? <CheckIcon /> : <XIcon />}
-                        <span> Password must contain a number </span>
-                    </div>
-                    <div className={`flex items-center gap-1 ${formDataChecks.password.specialCharacter ? "text-green-500" : "text-red-500"}`}>
-                        {formDataChecks.password.specialCharacter ? <CheckIcon /> : <XIcon />}
-                        <div>
-                            Password must contain a special character
-                            <div> (! @ # $ % ^ & * ? + -) </div>
-                        </div>
-                    </div>
-                    <div className={`flex items-center gap-1 ${formDataChecks.password.length ? "text-green-500" : "text-red-500"}`}>
-                        {formDataChecks.password.length ? <CheckIcon /> : <XIcon />}
-                        <span> Password must contain atleast 8 characters </span>
-                    </div>
-                </div>
-            }
+                        {
+                            !formDataChecks.password.ok &&
+                            <div className="password-validations text-sm flex flex-col gap-1.5">
+                                <div className={`flex items-center gap-1 ${formDataChecks.password.uppercase ? "text-success" : "text-destructive"}`}>
+                                    {formDataChecks.password.uppercase ? <CheckIcon /> : <XIcon />}
+                                    <span> Password must contain an uppercase letter </span>
+                                </div>
+                                <div className={`flex items-center gap-1 ${formDataChecks.password.lowercase ? "text-success" : "text-destructive"}`}>
+                                    {formDataChecks.password.lowercase ? <CheckIcon /> : <XIcon />}
+                                    <span> Password must contain a lowercase letter </span>
+                                </div>
+                                <div className={`flex items-center gap-1 ${formDataChecks.password.digit ? "text-success" : "text-destructive"}`}>
+                                    {formDataChecks.password.digit ? <CheckIcon /> : <XIcon />}
+                                    <span> Password must contain a number </span>
+                                </div>
+                                <div className={`flex items-center gap-1 ${formDataChecks.password.specialCharacter ? "text-success" : "text-destructive"}`}>
+                                    {formDataChecks.password.specialCharacter ? <CheckIcon /> : <XIcon />}
+                                    <div>
+                                        Password must contain a special character
+                                        <div> (! @ # $ % ^ & * ? + -) </div>
+                                    </div>
+                                </div>
+                                <div className={`flex items-center gap-1 ${formDataChecks.password.length ? "text-success" : "text-destructive"}`}>
+                                    {formDataChecks.password.length ? <CheckIcon /> : <XIcon />}
+                                    <span> Password must contain 8-100 characters </span>
+                                </div>
+                            </div>
+                        }
 
-            <div className="flex h-4 items-center justify-center">
-                {
-                    !state?.success &&
-                    <span className="error-message mt-1 text-sm text-red-600 text-center font-medium">
-                        {state.errors?.[0] || state.properties?.username?.errors?.[0] || state.properties?.password?.errors?.[0] || state.message || ""}
-                    </span>
-                }
-            </div>
+                        {/* <div className="flex h-4 items-center justify-center">
+                            {
+                                !state?.success &&
+                                <span className="error-message mt-1 text-sm text-red-600 text-center font-medium">
+                                    {state.errors?.[0] || state.properties?.username?.errors?.[0] || state.properties?.password?.errors?.[0] || state.message || ""}
+                                </span>
+                            }
+                        </div> */}
 
-            <button disabled={!(formDataChecks.ok && formDataChecks.passwordsMatch && !pending)} type="submit"
-                className="flex w-full items-center justify-center px-3 py-1.5 text-sm/6 font-semibold shadow-xs bg-blue-500 hover:bg-blue-400 mx-auto rounded-md text-white cursor-pointer m-3 disabled:pointer-events-none disabled:opacity-50">
-                <span> Sign up </span>
-            </button>
-
-            <div className="self-center font-medium text-sm">
-                <span> Already have an account? </span>
-                <Link href="/login" className="text-blue-500">Login</Link>
-            </div>
-
-        </form >
+                        <Field className="gap-4">
+                            <Button disabled={!formDataChecks.ok || pending} type="submit">
+                                <UserRoundPlusIcon className="w-5 h-5" />
+                                <span>Sign up</span>
+                            </Button>
+                            <FieldDescription className="text-center">
+                                <span> Already have an account? </span>
+                                <Link href="/login">Login</Link>
+                            </FieldDescription>
+                        </Field>
+                    </FieldGroup>
+                </form >
+            </CardContent>
+        </Card>
     )
 }
 
