@@ -32,6 +32,12 @@ export const login = async (prevState: any, formData: FormData) => {
 }
 
 export const logout = async () => {
-    await deleteSession();
-    redirect("/login");
+    try {
+        await deleteSession();
+    } catch (error) {
+        console.error("Failed to log out", error)
+    }
+    finally {
+        redirect("/login");
+    }
 }

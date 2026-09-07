@@ -1,13 +1,12 @@
 import mongoose, { Document, ObjectId } from "mongoose";
-import bcrypt from "bcryptjs";
-import { PaymentMethodEnum, TransactionTypeEnum, type TransactionType } from "@/lib/types";
+import { PaymentMethodEnum, TransactionTypeEnum } from "@/lib/types";
 
 
 export interface ITransaction extends Document {
     userId: ObjectId;
     amount: number;
     transactionTitle: string;
-    transactionType: TransactionType;
+    transactionType: keyof typeof TransactionTypeEnum;
     transactionDate: Date;
     transactionMode: PaymentMethodEnum;
     tags?: Array<string>;
@@ -66,17 +65,11 @@ const transactionSchema = new mongoose.Schema<ITransaction>(
 
 transactionSchema.index({
     userId: 1,
-    accountId: 1,
     transactionDate: -1,
 });
 
 // transactionSchema.pre("save", function () {
 // })
-
-// Validate password
-transactionSchema.methods.validPassword = function (password: string) {
-    return bcrypt.compareSync(password, this.password);
-};
 
 const Transaction = mongoose.models.Transaction || mongoose.model("Transaction", transactionSchema);
 

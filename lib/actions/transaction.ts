@@ -14,7 +14,7 @@ const transactionPayloadSchema = z.object({
     transactionTitle: z.string().trim().nonempty({ error: "Invalid title" }),
     transactionMode: z.enum(PaymentMethodEnum, { error: "Invalid payment method" }),
     transactionDate: z.coerce.date({ error: "Invalid date" }),
-    transactionTags: z.string().toLowerCase().trim()
+    tags: z.string().toLowerCase().trim()
         .array().transform(tags => [...new Set(tags.filter(Boolean))]).default([]).optional(),
     receiver: z.string().optional()
 })
@@ -43,4 +43,83 @@ export const addExpense = async (payload: unknown) => {
     await transaction.save()
 
     return { success: true, data: result.data, message: "Expense saved successfully" }
+}
+
+export const getTransactionsFromLast30Days = async (timezone: string) => {
+    const username = await getSessionUsername(await cookies())
+    if (!username) return { success: false, error: "Invalid request" }
+    const user = await getUserByUsername(username)
+    if (!user) return { success: false, error: "Invalid request" }
+
+    const startDate = new Date()
+    startDate.setDate(startDate.getDate() - 30)
+    startDate.setHours(0, 0, 0, 0)
+    const endDate = new Date()
+    console.log(startDate.toLocaleString())
+
+    const transactions = await Transaction.aggregate([
+        {
+            $match: {
+                userId: user._id,
+                transactionDate: {
+                    $gte: startDate,
+                    $lte: endDate
+                }
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    date: {
+                        $dateToString: {
+                            format: "%Y-%m-%d",
+                            date: "$transactionDate",
+                            timezone
+                        }
+                    }
+                },
+                credit: {
+                    $sum: {
+                        $cond: [
+                            { $eq: ["$transactionType", "credit"] },
+                            "$amount",
+                            0
+                        ]
+                    }
+                },
+                debit: {
+                    $sum: {
+                        $cond: [
+                            { $eq: ["$transactionType", "debit"] },
+                            "$amount",
+                            0
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                date: "$_id.date",
+                credit: 1,
+                debit: 1
+            }
+        }
+    ])
+
+    const transactionsMap = new Map(transactions.map(t => [t.date, { credit: t.credit, debit: t.debit }]))
+
+    const allTransactions = Array.from({ length: 30 }, (_, i) => {
+        const date = new Date()
+        date.setDate(date.getDate() - (29 - i))
+        const dateString = date.toISOString().split("T")[0]
+        return {
+            date: dateString,
+            credit: transactionsMap.get(dateString)?.credit ?? 0,
+            debit: transactionsMap.get(dateString)?.debit ?? 0,
+        }
+    })
+
+    return { success: true, data: allTransactions }
 }

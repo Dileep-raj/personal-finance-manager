@@ -10,7 +10,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm i && npm run build
+# Build a standalone output
+RUN npm i && NEXT_PRIVATE_STANDALONE=true npm run build
 
 # ==============================================
 # Stage 2: Build Final Image

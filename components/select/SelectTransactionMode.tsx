@@ -1,11 +1,10 @@
 "use client"
 
-import { PaymentMethod } from "@/lib/types";
-import { useId } from "react";
-import Select from "react-select";
+import { PaymentMethodEnum } from "@/lib/types";
+import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from "@/components/ui/combobox";
 
 interface PaymentMethodOption {
-    readonly value: PaymentMethod
+    readonly value: keyof typeof PaymentMethodEnum
     readonly label: string
     readonly color?: string;
     readonly isFixed?: boolean;
@@ -19,23 +18,35 @@ const paymentMethodOptions: readonly PaymentMethodOption[] = [
     { value: "upi", label: "UPI" }
 ]
 
-const SelectTransactionMode = ({ ...props }: any) => {
+interface SelectTransactionModeProps {
+    name?: string;
+    id?: string;
+    disabled?: boolean
+    required?: boolean
+    items?: readonly PaymentMethodOption[]
+}
+
+const SelectTransactionMode = (props: SelectTransactionModeProps) => {
     return (
-        <Select
-            {...props}
-            className="basic-single"
-            classNamePrefix="select"
-            placeholder="Select Payment Method"
-            defaultValue={paymentMethodOptions[0]}
-            isClearable={true}
-            isMulti={false}
-            isSearchable={true}
-            options={paymentMethodOptions}
-            instanceId={useId()}
-            styles={{
-                
-            }}
-        />
+        <Combobox
+            name={props.name ?? "transactionMode"}
+            id={props.id ?? "transactionMode"}
+            disabled={props.disabled ?? false}
+            items={props.items ?? paymentMethodOptions}
+            required={props.required ?? true}
+            itemToStringLabel={(paymentMethod: PaymentMethodOption) => paymentMethod.label}>
+            <ComboboxInput placeholder="Select Payment Method" />
+            <ComboboxContent>
+                <ComboboxEmpty>No payment methods found</ComboboxEmpty>
+                <ComboboxList>
+                    {
+                        (paymentMethod: PaymentMethodOption) => <ComboboxItem key={paymentMethod.value} value={paymentMethod}>
+                            {paymentMethod.label}
+                        </ComboboxItem>
+                    }
+                </ComboboxList>
+            </ComboboxContent>
+        </Combobox>
     )
 }
 
