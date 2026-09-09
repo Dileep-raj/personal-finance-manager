@@ -23,6 +23,7 @@ interface SelectTransactionModeProps {
     id?: string;
     disabled?: boolean
     required?: boolean
+    defaultValue?: keyof typeof PaymentMethodEnum
     items?: readonly PaymentMethodOption[]
 }
 
@@ -32,6 +33,7 @@ const SelectTransactionMode = (props: SelectTransactionModeProps) => {
             name={props.name ?? "transactionMode"}
             id={props.id ?? "transactionMode"}
             disabled={props.disabled ?? false}
+            defaultValue={paymentMethodOptions.find((option: PaymentMethodOption) => option.value === props.defaultValue)}
             items={props.items ?? paymentMethodOptions}
             required={props.required ?? true}
             itemToStringLabel={(paymentMethod: PaymentMethodOption) => paymentMethod.label}>

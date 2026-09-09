@@ -16,7 +16,7 @@ interface SelectTagsProps {
 }
 
 const SelectTags = (props: SelectTagsProps) => {
-  const [tags, setTags] = React.useState(new Array<string>())
+  const [tags, setTags] = React.useState(props.defaultValue ?? new Array<string>())
 
   React.useEffect(() => {
     props.onChange?.(tags)
