@@ -1,40 +1,13 @@
 'use server';
 
 import { z } from "zod";
-import { allowedSpecialCharacters, passwordRegex, usernameRegex } from "@/lib/common/constants";
 import User from "@/lib/mongodb/models/user.model";
+import { CommonResponse } from "@/lib/types";
+import { SignupPayload, signupSchema } from "../schemas/signup";
 
-const signupSchema = z.object({
-  username: z.string()
-    .toLowerCase()
-    .max(20, "Username must not exceed 20 characters")
-    .min(5, "Username must be atleast 5 characters long")
-    .regex(usernameRegex, { error: "Invalid username" })
-    .trim(),
-  password: z.string()
-    .min(8, { error: "Password must be atleast 8 characters long" })
-    .regex(/[A-Z]+/, { error: "Password must contain an uppercase letter" })
-    .regex(/[a-z]+/, { error: "Password must contain a lowercase letter" })
-    .regex(/\d+/, { "error": "Password must contain a digit" })
-    .regex(new RegExp(`[${allowedSpecialCharacters}]+`), { error: "Password must contain a special character" })
-    .regex(passwordRegex, { error: "Invalid password" })
-    .trim(),
-});
-
-export type SignupFormState = {
+export interface SignupFormState extends Partial<ReturnType<typeof z.flattenError<SignupPayload>>>, CommonResponse {
   status?: number
-  success: boolean
-  message?: string
-  errors?: string[]
-  properties?: {
-    username?: {
-      errors: string[]
-    }
-    password?: {
-      errors: string[];
-    }
-  }
-};
+}
 
 export const signup = async (prevState: SignupFormState, formData: FormData): Promise<SignupFormState> => {
 

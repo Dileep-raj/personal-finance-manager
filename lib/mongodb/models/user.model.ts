@@ -1,10 +1,12 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, InferSchemaType, Model } from "mongoose";
 import bcrypt from "bcryptjs";
 import { usernameRegex } from "@/lib/common/constants";
 
 export interface IUser extends Document {
     username: string;
     password: string;
+    firstname: string;
+    lastname: string;
 }
 
 const userSchema = new mongoose.Schema<IUser>(
@@ -24,6 +26,18 @@ const userSchema = new mongoose.Schema<IUser>(
             required: true,
             trim: true
         },
+        firstname: {
+            type: String,
+            trim: true,
+            maxLength: [70, "First name must not exceed 70 characters"],
+            default: null
+        },
+        lastname: {
+            type: String,
+            trim: true,
+            maxLength: [70, "Last name must not exceed 70 characters"],
+            default: null
+        }
     },
     { timestamps: true },
 );
@@ -38,6 +52,7 @@ userSchema.methods.validPassword = function (password: string) {
     return bcrypt.compareSync(password, this.password);
 };
 
-const User = mongoose.models.User || mongoose.model("User", userSchema);
+const User: Model<IUser> = mongoose.models.User || mongoose.model("User", userSchema);
 
+export type UserPayload = InferSchemaType<typeof userSchema>
 export default User;

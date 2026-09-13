@@ -1,4 +1,4 @@
-import mongoose, { Document, ObjectId } from "mongoose";
+import mongoose, { Document, Model, ObjectId } from "mongoose";
 import { PaymentMethodEnum, TransactionTypeEnum } from "@/lib/types";
 
 
@@ -71,6 +71,6 @@ transactionSchema.index({
 // transactionSchema.pre("save", function () {
 // })
 
-const Transaction = mongoose.models.Transaction || mongoose.model("Transaction", transactionSchema);
+const Transaction: Model<ITransaction> = mongoose.models.Transaction || mongoose.model("Transaction", transactionSchema);
 
 export default Transaction;
