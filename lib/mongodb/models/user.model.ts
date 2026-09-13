@@ -52,7 +52,7 @@ userSchema.methods.validPassword = function (password: string) {
     return bcrypt.compareSync(password, this.password);
 };
 
-const User: Model<IUser> = mongoose.models.User || mongoose.model("User", userSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 export type UserPayload = InferSchemaType<typeof userSchema>
 export default User;

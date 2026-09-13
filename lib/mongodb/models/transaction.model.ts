@@ -1,6 +1,5 @@
-import mongoose, { Document, Model, ObjectId } from "mongoose";
+import mongoose, { Document, ObjectId } from "mongoose";
 import { PaymentMethodEnum, TransactionTypeEnum } from "@/lib/types";
-
 
 export interface ITransaction extends Document {
     userId: ObjectId;
@@ -71,6 +70,6 @@ transactionSchema.index({
 // transactionSchema.pre("save", function () {
 // })
 
-const Transaction: Model<ITransaction> = mongoose.models.Transaction || mongoose.model("Transaction", transactionSchema);
+const Transaction = mongoose.models.Transaction || mongoose.model("Transaction", transactionSchema);
 
 export default Transaction;
