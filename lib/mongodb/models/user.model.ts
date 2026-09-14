@@ -1,4 +1,4 @@
-import mongoose, { Document, InferSchemaType, Model } from "mongoose";
+import mongoose, { Document, InferSchemaType } from "mongoose";
 import bcrypt from "bcryptjs";
 import { usernameRegex } from "@/lib/common/constants";
 

@@ -1,3 +1,4 @@
+import "server-only"
 import User from "@/lib/mongodb/models/user.model";
 
 export const getUserByUsername = async (username: string) => {

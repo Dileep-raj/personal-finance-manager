@@ -2,14 +2,22 @@
 
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar'
 import { NavUser } from '@/components/app-sidebar/navigation/nav-user'
-import { useState } from 'react'
+import { useEffect } from 'react'
+import { useUser, useUserUpdate } from '@/hooks/use-user-context'
+import { getCurrentUserDetails } from '@/lib/actions'
 
 const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
-    const [user, setUser] = useState({
-        name: "Name",
-        username: "username",
-        avatar: "",
-    })
+    const user = useUser()
+    const setUser = useUserUpdate()
+
+    useEffect(() => {
+        async function getUser() {
+            const userDetails = await getCurrentUserDetails()
+            console.log(userDetails)
+            if (userDetails) setUser(userDetails)
+        }
+        getUser()
+    }, [setUser])
 
     return (
         <Sidebar collapsible="icon" {...props}>

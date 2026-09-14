@@ -1,13 +1,10 @@
+"use client"
+
+import { UserDetails } from '@/lib/types/ui/user'
 import { createContext, useContext, useState } from 'react'
 
-interface User {
-    name?: string,
-    username: string,
-    avatar?: string,
-}
-
-export const UserContext = createContext<User | undefined>(undefined)
-export const UserUpdateContext = createContext<((user: User) => void) | null>(null)
+export const UserContext = createContext<UserDetails | undefined>(undefined)
+export const UserUpdateContext = createContext<((user: UserDetails) => void) | null>(null)
 
 export const useUser = () => {
     const user = useContext(UserContext)
@@ -22,10 +19,10 @@ export const useUserUpdate = () => {
 }
 
 const UserProvider = ({ children }: Readonly<{ children: React.ReactNode }>) => {
-    const [user, setUser] = useState<User>({
-        name: "",
+    const [user, setUser] = useState<UserDetails>({
+        firstname: "",
+        lastname: "",
         username: "",
-        avatar: "",
     })
 
     return (

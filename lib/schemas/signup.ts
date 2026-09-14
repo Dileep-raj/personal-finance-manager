@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { allowedSpecialCharacters, passwordRegex, usernameRegex } from "@/lib/common/constants";
 
+const transformToTitleCase = (s: string) => {
+    return s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+}
+
 export const signupSchema = z.object({
     username: z.string({ error: "Username must be a string" })
         .toLowerCase()
@@ -28,11 +32,13 @@ export const signupSchema = z.object({
     firstname: z.string({ error: "First name must be a string" })
         .max(50, { error: "First name cannot exceed 50 characters" })
         .trim()
-        .nonempty({ error: "First name cannot be empty" }),
+        .nonempty({ error: "First name cannot be empty" })
+        .transform(transformToTitleCase),
     lastname: z.string({ error: "Last name must be a string" })
         .max(50, { error: "Last name cannot exceed 50 characters" })
         .trim()
         .nonempty({ error: "Last name cannot be empty" })
+        .transform(transformToTitleCase)
 });
 
 export type SignupPayload = z.infer<typeof signupSchema>

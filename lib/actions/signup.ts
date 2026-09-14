@@ -15,14 +15,12 @@ export const signup = async (prevState: SignupFormState, formData: FormData): Pr
   const result = signupSchema.safeParse(Object.fromEntries(formData))
   if (result.error) return { ...z.treeifyError(result.error), success: false, status: 400 }
 
-  const { username, password } = result.data
-
   try {
     // Check if username already exists
-    const user = await User.findOne({ username })
+    const user = await User.findOne({ username: result.data.username })
     if (user) return { message: "Username already exists", success: false, status: 400 }
 
-    const newUser = new User({ username, password })
+    const newUser = new User(result.data)
     const save = await newUser.save()
 
     if (save.username) console.log("Saved user", save.username)
