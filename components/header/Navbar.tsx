@@ -1,24 +1,15 @@
 "use client"
 
-import { logout } from "@/lib/actions/login"
-import { LogOutIcon } from "lucide-react"
-import Link from "next/link"
+import { SidebarTrigger } from "@/components/ui/sidebar"
 
 const Navbar = () => {
   return (
     <nav>
-      <div className="flex flex-row justify-between items-center h-16 shadow">
-        <div className="flex items-center gap-2 p-4">
-          <Link href="/dashboard" >Dashboard</Link>
+      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+        <div className="flex items-center gap-2 px-4">
+          <SidebarTrigger className="-ml-1" />
         </div>
-        <div className="m-4">
-          <button type="submit" onClick={logout}
-            className="gap-2 flex w-full items-center justify-center px-3 py-1.5 text-sm/6 font-semibold shadow-xs bg-blue-500 hover:bg-blue-400 mx-auto rounded text-white cursor-pointer m-3">
-            <LogOutIcon className="w-5 h-5" />
-            <span >Logout</span>
-          </button>
-        </div>
-      </div>
+      </header>
     </nav>
   )
 }

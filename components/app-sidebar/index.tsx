@@ -5,6 +5,22 @@ import { NavUser } from '@/components/app-sidebar/navigation/nav-user'
 import { useEffect } from 'react'
 import { useUser, useUserUpdate } from '@/hooks/use-user-context'
 import { getCurrentUserDetails } from '@/lib/actions'
+import { NavMain } from './navigation/nav-main'
+import { NavMenuGroup } from '@/components/app-sidebar/types/nav-menu'
+import { LayoutDashboardIcon, WalletCardsIcon } from 'lucide-react'
+
+const navMenuItems: Array<NavMenuGroup> = [
+    {
+        title: 'Dashboard',
+        url: '/dashboard',
+        icon: <LayoutDashboardIcon />
+    },
+    {
+        title: 'Expenses',
+        url: '/expense',
+        icon: <WalletCardsIcon />
+    },
+]
 
 const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
     const user = useUser()
@@ -25,6 +41,7 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
             <SidebarHeader>
             </SidebarHeader>
             <SidebarContent>
+                <NavMain items={navMenuItems} />
             </SidebarContent>
             <SidebarFooter>
                 <NavUser user={user} />

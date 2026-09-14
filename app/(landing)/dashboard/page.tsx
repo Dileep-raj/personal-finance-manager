@@ -1,12 +1,9 @@
-import AddExpenseForm from "@/components/forms/AddExpenseForm"
+import TransactionsChart from "@/components/dashboard/charts/TransactionsChart"
 
-const Dashboard = () => {
-    return (
-        <div className="container mx-auto">
-            <h4 className="text-2xl font-bold mt-8"> Dashboard </h4>
-            <AddExpenseForm />
-        </div>
-    )
+const page = () => {
+  return (
+    <TransactionsChart />
+  )
 }
 
-export default Dashboard
+export default page
