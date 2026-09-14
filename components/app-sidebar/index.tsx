@@ -11,13 +11,14 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
     const setUser = useUserUpdate()
 
     useEffect(() => {
+        if (user.username) return
         async function getUser() {
             const userDetails = await getCurrentUserDetails()
             console.log(userDetails)
             if (userDetails) setUser(userDetails)
         }
         getUser()
-    }, [setUser])
+    }, [user, setUser])
 
     return (
         <Sidebar collapsible="icon" {...props}>
